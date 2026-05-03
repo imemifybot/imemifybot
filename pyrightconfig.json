@@ -1,0 +1,17 @@
+{
+  "venvPath": ".",
+  "venv": ".venv",
+  "pythonVersion": "3.14",
+  "pythonPlatform": "Windows",
+  "pythonPath": "C:/Users/LENOVO/OneDrive/Desktop/cryptowebitebuilder/.venv/Scripts/python.exe",
+  "extraPaths": [
+    "bot"
+  ],
+  "include": [
+    "bot"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/*.pyc"
+  ]
+}

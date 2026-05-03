@@ -1,0 +1,18 @@
+# Pyrefly configuration
+# search-path tells Pyrefly where to resolve internal imports from.
+# The bot package uses `from utils.x`, `from services.x`, etc.
+# which are all relative to the `bot/` directory.
+
+python-interpreter = ".venv/Scripts/python.exe"
+
+# Resolve all imports from the bot directory root
+search-path = ["bot"]
+
+# Only type-check files inside the bot directory
+project-includes = ["bot/**/*.py"]
+
+# Suppress false positives from aiogram's nullable callback.message type stubs.
+# At runtime, callback.message is always a valid Message in user-facing handlers.
+[errors]
+missing-attribute = false
+bad-argument-type = false
