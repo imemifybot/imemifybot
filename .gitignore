@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local secrets
+.env
+bot/.env
+
+# Local runtime and debug artifacts
+*.log
+test_output.txt
+bot/bot_database.db
+previews/
