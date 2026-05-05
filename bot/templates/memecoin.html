@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ header.content.logo | default('MEME COIN', true) }} - Official Website</title>
+  <meta name="description" content="{{ hero.content.subtitle | default('The future of meme coins', true) }}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee:wght@400&family=Space+Grotesk:wght@400;500;700&family=Titan+One&family=Fredoka:wght@400;500;600;700&family=Cherry+Bomb+One&family=Bebas+Neue&family=Inter:wght@400;500;700&family=Press+Start+2P&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+
+  {% set gs = hero.style if hero.style else {} %}
+  {% set hs = header.style if header.style else {} %}
+  {# Detect light theme: bg starts with #f, #e, #fff, or white keyword #}
+  {% set bg_val = gs.bg_color | default('#07160d', true) | lower %}
+  {% set is_light = bg_val.startswith('#f') or bg_val.startswith('#e') or bg_val == 'white' or bg_val == '#ffffff' or bg_val == '#fff' %}
+  <style>
+    :root {
+      --bg-body: {{ gs.bg_color | default('#fffcf2', true) }};
+      --text-body: {{ gs.text_color | default('#1a1a1a', true) }};
+      --primary: {{ gs.accent_color | default('#ffde59', true) }};
+      --btn-bg: {{ gs.button_color | default('#ffde59', true) }};
+      --btn-text: {{ gs.button_text_color | default('#1a1a1a', true) }};
+      --btn-radius: {% if gs.button_style == 'pill' %}999px{% elif gs.button_style == 'square' %}6px{% else %}20px{% endif %};
+      --card-bg: {{ gs.card_bg | default('#ffffff', true) }};
+      --muted: {{ gs.muted_color | default('#666666', true) }};
+      --header-bg: {{ hs.bg_color | default(gs.bg_color | default('#fffcf2', true), true) }};
+      --header-text: {{ hs.text_color | default(gs.text_color | default('#1a1a1a', true), true) }};
+      --panel: {{ gs.panel_color | default('rgba(255, 255, 255, 0.1)' if not is_light else 'rgba(0, 0, 0, 0.05)', true) }};
+      --border: {{ gs.border_color | default('#1a1a1a', true) }};
+      --card-border: {{ gs.card_border | default('3px solid var(--border)', true) }};
+      --card-shadow: {{ gs.card_shadow | default('8px 8px 0px rgba(0,0,0,0.1)', true) }};
+      --btn-border: {{ gs.btn_border | default('3px solid var(--border)', true) }};
+      --btn-shadow: {{ gs.btn_shadow | default('4px 4px 0px rgba(0,0,0,0.1)', true) }};
+      --glow: 0 0 0 1px {{ gs.glow_ring | default('rgba(0, 0, 0, 0.05)', true) }}, 0 10px 30px rgba(0, 0, 0, 0.05);
+      --ticker-bg: {{ gs.ticker_bg | default('var(--primary)', true) }};
+      --ticker-text: {{ gs.ticker_text | default('var(--btn-text)', true) }};
+      --bg-spot-1: {{ gs.bg_spot_1 | default('rgba(255, 71, 87, 0.15)', true) }};
+      --bg-spot-2: {{ gs.bg_spot_2 | default('rgba(30, 144, 255, 0.15)', true) }};
+      --bg-spot-3: {{ gs.bg_spot_3 | default('rgba(46, 213, 115, 0.15)', true) }};
+      --grid-pattern: {{ gs.grid_pattern | default('url("https://www.transparenttextures.com/patterns/natural-paper.png")', true) }};
+      --grid-opacity: {{ gs.grid_opacity | default('0.4', true) }};
+      --grid-size: {{ gs.grid_size | default('auto', true) }};
+      --heading-font: {{ gs.heading_font | default("'Cherry Bomb One', cursive", true) | safe }};
+      --body-font: {{ gs.body_font | default("'Fredoka', sans-serif", true) | safe }};
+      --heading-stroke: {{ gs.heading_stroke | default('none', true) | safe }};
+      --heading-gradient: {{ gs.heading_gradient | default('none', true) | safe }};
+      --heading-clip: {{ 'text' if (gs.heading_gradient and gs.heading_gradient != 'none') else 'border-box' }};
+      --heading-fill: {{ 'transparent' if (gs.heading_gradient and gs.heading_gradient != 'none') else 'currentcolor' }};
+      --section-title-color: {{ gs.section_title_color | default('var(--text-body)', true) }};
+      --about-h3-size: {{ gs.about_h3_size | default('clamp(34px, 4.2vw, 60px)', true) }};
+      --card-h3-size: {{ gs.card_h3_size | default('clamp(16px, 2vw, 24px)', true) }};
+      --card-value-size: {{ gs.card_value_size | default('clamp(24px, 3.8vw, 44px)', true) }};
+      --card-body-size: {{ gs.card_body_size | default('15px', true) }};
+      --vignette-color: {{ 'rgba(0,0,0,0.35)' if not is_light else 'rgba(0,0,0,0.04)' }};
+      --hero-overlay-1: {{ 'rgba(0,0,0,0.52)' if not is_light else 'rgba(0,0,0,0.06)' }};
+      --hero-overlay-2: {{ 'rgba(0,0,0,0.45)' if not is_light else 'rgba(0,0,0,0.04)' }};
+      --card-grad-stop: {{ 'rgba(0,0,0,0.25)' if not is_light else 'rgba(0,0,0,0.03)' }};
+      --footer-grad: {{ 'rgba(0,0,0,0.35)' if not is_light else 'rgba(0,0,0,0.02)' }};
+      --accent-2: {{ gs.accent_2 | default('#7c3aed', true) }};
+    }
+
+    body[data-theme='pepe'] {
+      --bg-body: #f5ffe8;
+      --text-body: #132a13;
+      --primary: #7ee000;
+      --btn-bg: #7ee000;
+      --btn-text: #132a13;
+      --card-bg: #ffffff;
+      --border: #132a13;
+      --ticker-bg: #9ef01a;
+      --ticker-text: #132a13;
+      --heading-font: 'Bungee', cursive;
+    }
+
+    body[data-theme='doge'] {
+      --bg-body: #fff7e0;
+      --text-body: #2d1f0d;
+      --primary: #f7c948;
+      --btn-bg: #f7c948;
+      --btn-text: #2d1f0d;
+      --card-bg: #fff3cc;
+      --border: #5c3d16;
+      --ticker-bg: #f7c948;
+      --ticker-text: #2d1f0d;
+      --heading-font: 'Titan One', cursive;
+    }
+
+    body[data-theme='neon'] {
+      --bg-body: #070a1a;
+      --text-body: #e6f7ff;
+      --primary: #00f5d4;
+      --btn-bg: linear-gradient(135deg, #00f5d4, #7c3aed);
+      --btn-text: #07121a;
+      --card-bg: #121530;
+      --muted: #9fb3c8;
+      --border: #00f5d4;
+      --panel: rgba(0, 245, 212, 0.12);
+      --ticker-bg: #7c3aed;
+      --ticker-text: #e6f7ff;
+      --heading-font: 'Bebas Neue', sans-serif;
+      --btn-shadow: 0 0 0 2px #00f5d4, 0 0 26px rgba(0, 245, 212, 0.42);
+      --card-shadow: 0 0 0 2px rgba(124, 58, 237, 0.8), 0 0 28px rgba(0, 245, 212, 0.25);
+    }
+
+    body[data-theme='pixel'] {
+      --bg-body: #121212;
+      --text-body: #f5f5f5;
+      --primary: #ff4ecd;
+      --btn-bg: #ff4ecd;
+      --btn-text: #12001f;
+      --card-bg: #1f1f1f;
+      --muted: #cccccc;
+      --border: #f5f5f5;
+      --panel: rgba(255, 78, 205, 0.12);
+      --heading-font: 'Press Start 2P', monospace;
+      --body-font: 'Share Tech Mono', monospace;
+      --btn-radius: 6px;
+      --card-border: 2px solid var(--border);
+      --card-shadow: 6px 6px 0px rgba(0, 0, 0, 0.6);
+      --btn-shadow: 4px 4px 0px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    h1, h2, h3, .token-card .value, .footer-logo, .hero-tagline, .logo-text, .rm-dot, .marquee-highlight {
+      -webkit-text-stroke: var(--heading-stroke);
+      background: var(--heading-gradient);
+      -webkit-background-clip: var(--heading-clip);
+      background-clip: var(--heading-clip);
+      -webkit-text-fill-color: var(--heading-fill);
+    }
+
+    body {
+      font-family: var(--body-font);
+      color: var(--text-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-color: var(--bg-body);
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: var(--grid-opacity);
+      background-image: var(--grid-pattern);
+      background-size: var(--grid-size);
+      z-index: -1;
+    }
+
+    body::after {
+      content: "";
+      display: none;
+    }
+
+
+    .container {
+      width: min(1140px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .section {
+      padding: 90px 0;
+      position: relative;
+    }
+
+    .section-soft {
+      background: transparent;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: 3px solid var(--text-body);
+      border-radius: 999px;
+      background: var(--primary);
+      color: var(--btn-text);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .section-title h2 {
+      margin-top: 12px;
+      font-family: var(--heading-font);
+      font-size: clamp(34px, 5vw, 68px);
+      line-height: 1.1;
+      color: var(--section-title-color);
+      text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.02em;
+      transform: rotate(-1deg);
+    }
+
+    .card {
+      background: linear-gradient(165deg, var(--card-bg), var(--card-grad-stop));
+      border: var(--card-border);
+      border-radius: 32px;
+      box-shadow: var(--card-shadow);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .card:hover {
+      transform: translateY(-8px) rotate(-1deg);
+      box-shadow: 12px 12px 0px rgba(0,0,0,0.1);
+    }
+
+    .token-card:nth-child(odd),
+    .buy-step:nth-child(odd),
+    .rm-phase:nth-child(odd) {
+      transform: rotate(-0.7deg);
+    }
+
+    .token-card:nth-child(even),
+    .buy-step:nth-child(even),
+    .rm-phase:nth-child(even) {
+      transform: rotate(0.7deg);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 15px 32px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: var(--btn-radius);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: var(--btn-border);
+      cursor: pointer;
+      font-family: var(--heading-font);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      box-shadow: var(--btn-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      inset: -30% auto -30% -120%;
+      width: 52%;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,0.38), transparent);
+      transform: rotate(8deg);
+      animation: btnShine 3.2s ease-in-out infinite;
+    }
+
+    .btn-outline {
+      background: var(--panel);
+      color: var(--text-body);
+      border: 2px solid var(--primary);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: var(--btn-text);
+      border-color: var(--primary);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      border-bottom: var(--card-border);
+      background: var(--header-bg);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-inner {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--header-text);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: var(--card-border);
+      box-shadow: var(--card-shadow);
+    }
+
+    .logo-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+    }
+
+    .logo-text {
+      font-family: var(--heading-font);
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    nav a {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--header-text);
+      background: var(--panel);
+      padding: 8px 14px;
+      border-radius: var(--btn-radius);
+      border: 1px solid rgba(0,0,0,0.08);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    nav a:hover {
+      background: var(--primary);
+      color: var(--btn-text);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .hero {
+      padding: 30px 0 58px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      display: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      margin-top: 16px;
+      font-family: var(--heading-font);
+      font-size: clamp(42px, 6vw, 82px);
+      line-height: 1.08;
+      letter-spacing: 0.02em;
+      text-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 0 24px rgba(34, 197, 94, 0.3);
+      max-width: 760px;
+    }
+
+    .hero-ticker {
+      display: block;
+    }
+
+    .hero-tagline {
+      display: block;
+      font-family: var(--heading-font);
+      font-size: clamp(18px, 2.4vw, 34px);
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      text-shadow: none;
+      margin-top: 4px;
+      opacity: 0.88;
+    }
+
+    .hero-content p {
+      margin-top: 22px;
+      max-width: 620px;
+      font-size: clamp(20px, 3vw, 28px);
+      color: var(--text-body);
+      font-family: var(--heading-font);
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 28px;
+    }
+
+    .hero-mascot {
+      position: relative;
+      min-height: 350px;
+      display: grid;
+      place-items: center;
+    }
+
+    .hero-mascot::before {
+      content: "";
+      width: min(460px, 90%);
+      aspect-ratio: 1;
+      border-radius: 44% 56% 60% 40% / 40% 44% 56% 60%;
+      background: linear-gradient(160deg, var(--card-bg), rgba(0, 0, 0, 0.1));
+      border: var(--card-border);
+      box-shadow: var(--card-shadow);
+      animation: floatBlob 8s ease-in-out infinite;
+    }
+
+    .mascot-emoji {
+      position: absolute;
+      font-size: clamp(88px, 14vw, 190px);
+      filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.4));
+      animation: bounceMascot 4.2s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .hero-image {
+      position: absolute;
+      width: min(300px, 62%);
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 28px;
+      border: var(--card-border);
+      box-shadow: var(--card-shadow);
+      animation: bounceMascot 4.2s ease-in-out infinite;
+    }
+
+    .contract-strip {
+      margin-top: 20px;
+    }
+
+    .contract-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 3px solid var(--border);
+      background: #ffffff;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+      flex-wrap: wrap;
+      font-family: monospace;
+      font-size: 14px;
+      width: fit-content;
+      max-width: min(760px, 100%);
+    }
+
+    .contract-box>div {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .contract-box .label {
+      color: #1a1a1a;
+      font-weight: 800;
+      margin-right: 6px;
+      text-transform: uppercase;
+    }
+
+    .contract-box .address {
+      color: #1a1a1a;
+      word-break: break-all;
+      opacity: 0.8;
+    }
+
+    .copy-icon {
+      cursor: pointer;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-radius: 12px;
+      background: var(--btn-bg);
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 2px solid rgba(0,0,0,0.6);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+    }
+
+    .copy-icon:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 rgba(0,0,0,0.4);
+    }
+
+    .copy-icon:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 rgba(0,0,0,0.4);
+    }
+
+    .copy-icon svg {
+      filter: drop-shadow(0 1px 0 rgba(0,0,0,0.2));
+    }
+
+    .copy-tooltip {
+      position: absolute;
+      top: -38px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text-body);
+      color: var(--bg-body);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+      border: 2px solid rgba(0,0,0,0.6);
+      box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+      font-family: var(--heading-font);
+      font-weight: 700;
+    }
+
+    .copy-tooltip.show {
+      opacity: 1;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .about-media,
+    .about-card {
+      padding: 28px;
+      min-height: 320px;
+    }
+
+    .about-media {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      background: linear-gradient(155deg, var(--card-bg), var(--card-grad-stop));
+    }
+
+    .about-media .big {
+      font-size: clamp(120px, 17vw, 220px);
+      line-height: 1;
+      text-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .about-image {
+      width: min(330px, 88%);
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 22px;
+      border: var(--card-border);
+      box-shadow: var(--card-shadow);
+    }
+
+    .about-card h3 {
+      margin-top: 8px;
+      font-family: var(--heading-font);
+      font-size: var(--about-h3-size);
+      line-height: 1.1;
+      text-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+    }
+
+    .about-card p {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: var(--card-body-size);
+    }
+
+    .token-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: stretch;
+      gap: 14px;
+    }
+
+    .token-card {
+      flex: 0 1 240px;
+      max-width: 260px;
+      width: 100%;
+      padding: 22px 16px;
+      text-align: center;
+    }
+
+    .token-card .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .token-card .value {
+      font-family: var(--heading-font);
+      font-size: var(--card-value-size);
+      line-height: 1;
+      color: var(--text-body);
+      text-shadow: 0 0 18px rgba(34, 197, 94, 0.25);
+    }
+
+    .tokenomics-image-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 0 0 18px;
+    }
+
+    .tokenomics-image {
+      width: min(320px, 100%);
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 20px;
+      border: var(--card-border);
+      box-shadow: var(--card-shadow);
+    }
+
+    .buy-grid {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: stretch;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      padding: 2px 2px 8px;
+      margin-bottom: 20px;
+    }
+
+    .buy-step {
+      flex: 0 0 210px;
+      min-height: 220px;
+      padding: 20px 16px 18px;
+      position: relative;
+      border: var(--card-border);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 15% 18%, rgba(255, 255, 255, 0.18), transparent 36%),
+        linear-gradient(165deg, var(--card-bg), rgba(0, 0, 0, 0.42));
+      box-shadow: var(--card-shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-num {
+      position: relative;
+      top: auto;
+      right: auto;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--btn-bg);
+      color: var(--btn-text);
+      font-family: var(--heading-font);
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0;
+      border: 3px solid rgba(0, 0, 0, 0.55);
+      box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--btn-bg);
+      margin: 0 auto 14px;
+      flex-shrink: 0;
+      z-index: 2;
+      transition: transform 0.2s ease;
+    }
+
+    .buy-step:hover .step-num {
+      transform: scale(1.12) rotate(-5deg);
+    }
+
+    .buy-step .icon {
+      font-size: 34px;
+      margin-bottom: 8px;
+      display: inline-block;
+      filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.35));
+      transform: rotate(-4deg);
+    }
+
+    .buy-step-image {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 16px;
+      border: var(--card-border);
+      margin: 0 auto 8px;
+      display: block;
+      box-shadow: var(--card-shadow);
+    }
+
+    .buy-step h3 {
+      font-family: var(--heading-font);
+      font-size: var(--card-h3-size);
+      margin-bottom: 6px;
+      line-height: 1.2;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.32);
+    }
+
+    .buy-step p {
+      color: var(--muted);
+      font-size: var(--card-body-size);
+    }
+
+    .roadmap-grid {
+      display: grid;
+      gap: 14px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .rm-phase {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .rm-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      border: var(--card-border);
+      background: var(--card-bg);
+      box-shadow: var(--card-shadow);
+    }
+
+    .rm-text h3 {
+      font-size: var(--card-h3-size);
+      margin-bottom: 3px;
+      font-family: var(--heading-font);
+      letter-spacing: 0.03em;
+    }
+
+    .rm-text p {
+      color: var(--muted);
+      font-size: var(--card-body-size);
+    }
+
+    .faq-grid {
+      display: grid;
+      gap: 14px;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      padding: 20px;
+    }
+
+    .faq-item h3 {
+      font-family: var(--heading-font);
+      font-size: var(--card-h3-size);
+      margin-bottom: 6px;
+    }
+
+    .faq-item p {
+      color: var(--muted);
+      font-size: var(--card-body-size);
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .social-link {
+      padding: 13px 26px;
+      font-weight: 700;
+      border: var(--btn-border);
+      border-radius: 999px;
+      background: var(--panel);
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      box-shadow: var(--btn-shadow);
+      font-family: var(--heading-font);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      transition: transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+      color: var(--text-body);
+      text-decoration: none;
+    }
+
+    .social-link:hover {
+      transform: translateY(-5px) scale(1.06);
+      background: var(--primary);
+      color: var(--btn-text);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.25);
+    }
+
+    footer {
+      padding: 34px 0 54px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      background: linear-gradient(180deg, transparent, var(--footer-grad));
+    }
+
+    .footer-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      color: var(--primary);
+      font-family: var(--heading-font);
+      font-size: 26px;
+    }
+
+    @keyframes floatBlob {
+
+      0%,
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+
+      50% {
+        transform: translateY(-8px) rotate(1deg);
+      }
+    }
+
+    @keyframes bounceMascot {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    @keyframes btnShine {
+      0%, 72% { left: -120%; }
+      100% { left: 140%; }
+    }
+
+    @media (max-width: 980px) {
+      nav {
+        display: none;
+      }
+
+      /* Disable reveal animations on mobile/tablet to prevent hidden sections issues */
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+
+      .hero-inner,
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 108px;
+      }
+
+      .hero-content {
+        text-align: center;
+      }
+
+      .hero-content p,
+      .hero-actions {
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero-mascot {
+        min-height: 280px;
+      }
+
+      .token-grid {
+        justify-content: center;
+      }
+
+      .buy-step {
+        flex: 0 0 200px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .section {
+        padding: 56px 0;
+      }
+
+      .token-grid {
+        justify-content: center;
+      }
+
+      .btn {
+        width: 100%;
+        font-size: 14px;
+        padding: 12px 18px;
+      }
+
+      .hero-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      /* Fix buy steps on mobile: wrap instead of scroll */
+      .buy-grid {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        justify-content: center;
+      }
+
+      .buy-step {
+        flex: 0 1 calc(50% - 8px);
+        min-width: 140px;
+        max-width: 100%;
+      }
+
+      /* Contract address wraps correctly */
+      .contract-box {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 12px;
+        word-break: break-all;
+      }
+
+      .contract-box .address {
+        font-size: 11px;
+      }
+
+      /* About section emoji size */
+      .about-media .big {
+        font-size: clamp(72px, 22vw, 120px);
+      }
+
+      /* Hero mascot smaller */
+      .hero-mascot {
+        min-height: 220px;
+      }
+
+      .mascot-emoji {
+        font-size: clamp(60px, 20vw, 110px);
+      }
+
+      .hero-image {
+        width: min(200px, 70%);
+      }
+
+      /* Roadmap full width */
+      .rm-phase {
+        grid-template-columns: auto 1fr;
+        gap: 10px;
+      }
+
+      /* FAQ padding */
+      .faq-item {
+        padding: 16px;
+      }
+
+      .faq-item h3 {
+        font-size: 18px;
+      }
+
+      /* Social links full width */
+      .social-link {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .container {
+        width: calc(100% - 20px);
+      }
+
+      .hero-content h1 {
+        font-size: clamp(32px, 9vw, 48px);
+      }
+
+      .hero-tagline {
+        font-size: clamp(14px, 4.5vw, 22px);
+      }
+
+      .hero-content p {
+        font-size: 15px;
+      }
+
+      .section-title h2 {
+        font-size: clamp(24px, 7vw, 38px);
+      }
+
+      /* Buy steps stack to single column on very small phones */
+      .buy-step {
+        flex: 0 1 100%;
+      }
+
+      .token-card {
+        flex: 0 1 calc(50% - 8px);
+        max-width: none;
+      }
+
+      .about-card h3 {
+        font-size: clamp(26px, 7vw, 40px);
+      }
+
+      .header-inner {
+        height: 60px;
+      }
+
+      .logo-text {
+        font-size: 15px;
+      }
+    }
+    {% if is_preview %}
+    .preview-watermark {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.15;
+      user-select: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Ctext x='100' y='100' fill='%23ff0000' font-family='sans-serif' font-weight='900' font-size='22' transform='rotate(-30 100 100)'%3EPREVIEW ONLY%3C/text%3E%3Ctext x='300' y='150' fill='%23ff0000' font-family='sans-serif' font-weight='900' font-size='22' transform='rotate(-30 300 150)'%3EUNAUTHORIZED COPY%3C/text%3E%3Ctext x='150' y='320' fill='%23ff0000' font-family='sans-serif' font-weight='900' font-size='22' transform='rotate(-30 150 320)'%3EPREVIEW ONLY%3C/text%3E%3Ctext x='350' y='350' fill='%23ff0000' font-family='sans-serif' font-weight='900' font-size='22' transform='rotate(-30 350 350)'%3EMEMEWEB BUILDER%3C/text%3E%3C/svg%3E");
+      background-repeat: repeat;
+      animation: watermarkShine 3s infinite ease-in-out;
+    }
+
+    @keyframes watermarkShine {
+      0%, 100% { opacity: 0.12; }
+      50% { opacity: 0.25; }
+    }
+
+    .preview-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ff4757;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 99px;
+      font-family: var(--heading-font);
+      font-size: 16px;
+      z-index: 10000;
+      box-shadow: 0 10px 30px rgba(255, 71, 87, 0.4);
+      border: 3px solid #000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    {% endif %}
+  </style>
+</head>
+
+<body data-theme="{{ gs.theme_variant | default('classic', true) }}">
+  {% if is_preview %}
+  <div class="preview-watermark"></div>
+  <div class="preview-banner">
+    <span>⚠️ PREVIEW MODE</span>
+    <span style="opacity: 0.8; font-size: 0.8em;">| PAY TO REMOVE WATERMARK</span>
+  </div>
+  {% endif %}
+  {% if header.enabled %}
+  <header>
+    <div class="container header-inner">
+      <a href="{{ site.home_anchor }}" class="logo">
+        <span class="logo-icon">
+          {% if header.content.logo_image %}
+          <img src="{{ header.content.logo_image }}" alt="logo" class="logo-image">
+          {% elif site.coin_image %}
+          <img src="{{ site.coin_image }}" alt="logo" class="logo-image">
+          {% else %}
+          🐸
+          {% endif %}
+        </span>
+        <span class="logo-text">{{ header.content.logo | default('MEME COIN', true) }}</span>
+      </a>
+
+      <nav>
+        {% if site.nav_items %}
+        {% for item in site.nav_items %}
+        {% set nav_label = item.label
+          | replace('How To Buy', 'Ape In')
+          | replace('Roadmap', 'Wen Moon')
+          | replace('Socials', 'Raid Links')
+        %}
+        <a href="#{{ item.anchor }}">{{ nav_label }}</a>
+        {% endfor %}
+        {% endif %}
+      </nav>
+
+      {% if hero.content.button %}
+      <a href="{{ hero.content.link | default('#', true) }}" class="btn btn-primary">{{ hero.content.button }}</a>
+      {% endif %}
+    </div>
+  </header>
+  {% endif %}
+
+  {% if hero.enabled and hero.content.title %}
+  <section class="hero" id="home">
+    <div class="container hero-inner">
+      <div class="hero-content reveal">
+        {% set title_parts = hero.content.title.split(' ', 1) %}
+        <h1>
+          <span class="hero-ticker">{{ title_parts[0] }}</span>
+          {% if title_parts | length > 1 %}
+          <span class="hero-tagline">{{ title_parts[1] }}</span>
+          {% endif %}
+        </h1>
+        {% set subtitle_text = hero.content.subtitle | default('The most ridiculous, fun, and unstoppable meme coin on the blockchain. Grab your bags!', true) %}
+        <p>{{ subtitle_text }}</p>
+
+        <div class="hero-actions">
+          {% if hero.content.button %}
+          <a href="{{ hero.content.link | default('#', true) }}" class="btn btn-primary">{{ hero.content.button }}</a>
+          {% endif %}
+          {% if site.hero_secondary %}
+          <a href="#{{ site.hero_secondary.anchor }}" class="btn btn-outline">{{ site.hero_secondary.label }}</a>
+          {% endif %}
+        </div>
+
+        {% if hero.content.contract %}
+        <div class="contract-strip" style="margin-top:18px;">
+          <div class="contract-box card">
+            <div>
+              <span class="label">CA / Contract</span>
+              <span class="address" id="contract-address">{{ hero.content.contract }}</span>
+            </div>
+            <span class="copy-icon" onclick="copyContract(this)" title="Copy to clipboard">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--btn-text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="3" ry="3"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span class="copy-tooltip">COPIED!</span>
+            </span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="hero-mascot reveal">
+        {% if hero.content.hero_image %}
+        <img src="{{ hero.content.hero_image }}" alt="hero" class="hero-image">
+        {% elif site.coin_image %}
+        <img src="{{ site.coin_image }}" alt="hero" class="hero-image">
+        {% else %}
+        <div class="mascot-emoji">🐸</div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee Banner -->
+  <div
+    style="background: var(--ticker-bg); color: var(--ticker-text); padding: 14px 0; overflow: hidden; display: flex; white-space: nowrap; border-top: var(--card-border); border-bottom: var(--card-border); font-family: var(--heading-font); font-size: 22px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transform: rotate(-1deg) scale(1.02); z-index: 10; position: relative;">
+    <div style="display: inline-flex; align-items: center; animation: marquee 15s linear infinite;">
+      <span style="margin-right: 30px; display:inline-flex; align-items:center;">BUY {{ header.content.logo | default('MEME COIN', true) }} • 🚀 <span class="marquee-highlight" style="display: inline; margin-left: 6px;">TO THE MOON</span> • 💎 HODL • 1000X POTENTIAL • </span>
+      <span style="margin-right: 30px; display:inline-flex; align-items:center;">BUY {{ header.content.logo | default('MEME COIN', true) }} • 🚀 <span class="marquee-highlight" style="display: inline; margin-left: 6px;">TO THE MOON</span> • 💎 HODL • 1000X POTENTIAL • </span>
+      <span style="margin-right: 30px; display:inline-flex; align-items:center;">BUY {{ header.content.logo | default('MEME COIN', true) }} • 🚀 <span class="marquee-highlight" style="display: inline; margin-left: 6px;">TO THE MOON</span> • 💎 HODL • 1000X POTENTIAL • </span>
+      <span style="margin-right: 30px; display:inline-flex; align-items:center;">BUY {{ header.content.logo | default('MEME COIN', true) }} • 🚀 <span class="marquee-highlight" style="display: inline; margin-left: 6px;">TO THE MOON</span> • 💎 HODL • 1000X POTENTIAL • </span>
+    </div>
+    <style>
+      @keyframes marquee {
+        0% {
+          transform: translateX(0);
+        }
+
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+    </style>
+  </div>
+  {% endif %}
+
+  {% if about.enabled and about.content.text %}
+  <section class="section section-soft" id="about">
+    <div class="container about-grid">
+      <div class="about-media card reveal">
+        {% if about.content.about_image %}
+        <img src="{{ about.content.about_image }}" alt="about" class="about-image">
+        {% elif site.coin_image %}
+        <img src="{{ site.coin_image }}" alt="about" class="about-image">
+        {% else %}
+        <div class="big">🐸</div>
+        {% endif %}
+      </div>
+
+      <div class="about-card card reveal">
+        <div class="pill">Meme Lore</div>
+        <h3>{{ about.content.title | default('The Most Unhinged Community Coin', true) }}</h3>
+        <p>{{ about.content.text }}</p>
+        {% if site.about_cta %}
+        <a href="#{{ site.about_cta.anchor }}" class="btn btn-primary" style="margin-top:16px;">{{ site.about_cta.label
+          }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if buy.enabled and buy.content.steps %}
+  <section class="section" id="buy">
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="pill">Ape Guide</div>
+        <h2>How To Ape In</h2>
+      </div>
+
+      <div class="buy-grid">
+        {% for step in buy.content.steps.split('\n') %}
+        {% if step.strip() %}
+        <div class="buy-step card reveal">
+          <div class="step-num">{{ loop.index }}</div>
+          {% set step_img = buy.content.buy_step_1_image if loop.index == 1 else (buy.content.buy_step_2_image if
+          loop.index == 2 else (buy.content.buy_step_3_image if loop.index == 3 else '')) %}
+          {% if step_img %}
+          <img src="{{ step_img }}" alt="step {{ loop.index }}" class="buy-step-image">
+          {% else %}
+          <div class="icon">{% if loop.index == 1 %}👛{% elif loop.index == 2 %}🔐{% elif loop.index == 3 %}💱{% else
+            %}🚀{% endif %}</div>
+          {% endif %}
+          <h3>{% if loop.index == 1 %}Make Wallet{% elif loop.index == 2 %}Fund It{% elif loop.index == 3 %}Buy &
+            HODL{% else %}Moon{% endif %}</h3>
+          <p>{{ step.strip() }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <div style="text-align:center" class="reveal">
+        <a href="{{ hero.content.link | default('#', true) }}" class="btn btn-primary">{{ buy.content.button |
+          default('Buy The Meme', true) }}</a>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if tokenomics.enabled and tokenomics.content.supply %}
+  <section class="section section-soft" id="tokenomics">
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="pill">Token Metrics</div>
+        <h2>Tokenomics</h2>
+      </div>
+
+      {% if tokenomics.content.tokenomics_image %}
+      <div class="tokenomics-image-wrap reveal">
+        <img src="{{ tokenomics.content.tokenomics_image }}" alt="tokenomics" class="tokenomics-image">
+      </div>
+      {% endif %}
+
+      <div class="token-grid">
+        <div class="token-card card reveal">
+          <div class="label">Total Supply</div>
+          <div class="value">{{ tokenomics.content.supply }}</div>
+        </div>
+
+        {% if tokenomics.content.tax %}
+        <div class="token-card card reveal">
+          <div class="label">Buy / Sell Tax</div>
+          <div class="value">{{ tokenomics.content.tax }}</div>
+        </div>
+        {% endif %}
+
+        {% if tokenomics.content.burn and tokenomics.content.burn != 'N/A' %}
+        <div class="token-card card reveal">
+          <div class="label">Burned</div>
+          <div class="value">{{ tokenomics.content.burn }}</div>
+        </div>
+        {% endif %}
+
+        {% if tokenomics.content.liquidity %}
+        <div class="token-card card reveal">
+          <div class="label">Liquidity</div>
+          <div class="value">{{ tokenomics.content.liquidity }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if roadmap.enabled and roadmap.content.phases %}
+  <section class="section" id="roadmap">
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="pill">Wen Moon?</div>
+        <h2>Moonmap</h2>
+      </div>
+
+      <div class="roadmap-grid">
+        {% for phase in roadmap.content.phases.split('\n') %}
+        {% if phase.strip() %}
+        <div class="rm-phase card reveal">
+          <div class="rm-dot">{% if loop.index == 1 %}🥚{% elif loop.index == 2 %}🐣{% elif loop.index == 3 %}🦅{% else
+            %}🚀{% endif %}</div>
+          <div class="rm-text">
+            <h3>Phase {{ loop.index }}</h3>
+            <p>{{ phase.strip() }}</p>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="section section-soft" id="faq">
+    <div class="container">
+      <div class="section-title reveal">
+        <div class="pill">Questions?</div>
+        <h2>FAQ</h2>
+      </div>
+
+      <div class="faq-grid">
+        <div class="faq-item card reveal">
+          <h3>What is {{ header.content.logo | default('MEME COIN', true) }}?</h3>
+          <p>It is a community-first meme coin with high-energy branding, zero boring vibes, and strong degenerate
+            spirit.</p>
+        </div>
+
+        <div class="faq-item card reveal">
+          <h3>Are there any taxes?</h3>
+          <p>Use the tokenomics section above for your latest buy/sell tax setup and supply details.</p>
+        </div>
+
+        <div class="faq-item card reveal">
+          <h3>Is liquidity locked?</h3>
+          <p>Add your official lock details and contract proofs so your community can verify everything quickly.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% if socials.enabled %}
+  <section class="section" id="socials">
+    <div class="container" style="text-align:center;">
+      <div class="section-title reveal">
+        <div class="pill">🌐 Join The Raiders</div>
+        <h2>Community Links</h2>
+      </div>
+
+      {# Build a list of platforms that have real URLs (not empty and not just '#') #}
+      {% set platforms = [
+        ('telegram',    '✈️',  'Telegram',    socials.content.telegram    | default('', true)),
+        ('twitter',     '🐦',  'X / Twitter', socials.content.twitter     | default('', true)),
+        ('discord',     '👾',  'Discord',     socials.content.discord     | default('', true)),
+        ('instagram',   '📸',  'Instagram',   socials.content.instagram   | default('', true)),
+        ('tiktok',      '🎵',  'TikTok',      socials.content.tiktok      | default('', true)),
+        ('facebook',    '📘',  'Facebook',    socials.content.facebook    | default('', true)),
+        ('reddit',      '🤖',  'Reddit',      socials.content.reddit      | default('', true)),
+        ('binance',     '🟡',  'Binance',     socials.content.binance     | default('', true)),
+        ('dexscreener', '📊',  'DexScreener', socials.content.dexscreener | default('', true)),
+      ] %}
+
+      <div class="social-links reveal">
+        {% for key, icon, label, url in platforms %}
+          {% if url and url != '#' %}
+          <a href="{{ url }}" class="social-link" target="_blank" rel="noopener noreferrer">{{ icon }} {{ label }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if footer.enabled %}
+  <footer id="footer">
+    <div class="container">
+      <div class="footer-logo">
+        <span>
+          {% if site.coin_image %}
+          <img src="{{ site.coin_image }}" alt="logo" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; display: inline-block; vertical-align: middle;">
+          {% else %}
+          🐸
+          {% endif %}
+        </span>
+        <span>{{ header.content.logo | default('MEME COIN', true) }}</span>
+      </div>
+      <p class="muted">{{ footer.content.text | default('© 2026 Meme Coin. All rights reserved. Do your own research.',
+        true) }}</p>
+    </div>
+  </footer>
+  {% endif %}
+
+  <script>
+    // Reveal elements as they scroll into view
+    const revealAll = () => {
+      document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+    };
+
+    // On mobile screens, skip animation — show everything immediately
+    if (window.innerWidth <= 768) {
+      revealAll();
+    } else if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in');
+            observer.unobserve(entry.target);
+          }
+        }
+      }, {
+        threshold: 0.05,
+        rootMargin: '0px 0px -30px 0px'
+      });
+
+      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+      // Safety fallback: reveal everything after 2s in case observer misses any element
+      setTimeout(() => revealAll(), 2000);
+    } else {
+      // Browser doesn't support IntersectionObserver — show everything immediately
+      revealAll();
+    }
+
+    // Copy contract address to clipboard
+    function copyContract(iconEl) {
+      const address = document.getElementById('contract-address').innerText;
+      navigator.clipboard.writeText(address).then(() => {
+        const tooltip = iconEl ? iconEl.querySelector('.copy-tooltip') : document.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(() => tooltip.classList.remove('show'), 1800);
+        }
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+  </script>
+  {% if is_preview %}
+  <!-- Anti-Theft Watermark & Protections -->
+  <style>
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999999;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Cpath d='M0 0h300v200H0z' fill='none'/%3E%3Cg transform='rotate(-25 150 100)'%3E%3Ctext x='50%25' y='40%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='28' font-weight='700' fill='%23ffffff' fill-opacity='0.3' stroke='%23000000' stroke-opacity='0.5' stroke-width='1.2'%3EPREVIEW ONLY%3C/text%3E%3Ctext x='50%25' y='60%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial, sans-serif' font-size='28' font-weight='700' fill='%23ffffff' fill-opacity='0.3' stroke='%23000000' stroke-opacity='0.5' stroke-width='1.2'%3EUNPAID%3C/text%3E%3C/g%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-position: top left;
+      opacity: 0.6;
+    }
+    
+    /* Disable text selection */
+    body {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+  </style>
+  <script>
+    // Disable right click mapping and save shortcuts
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S' || e.key === 'u' || e.key === 'U')) {
+        e.preventDefault();
+        alert('Code copying is disabled in Preview mode. Please complete the setup via the Bot to get the clean source code.');
+      }
+      if (e.key === 'F12') {
+        e.preventDefault();
+      }
+    });
+  </script>
+  {% endif %}
+</body>
+
+</html>
