@@ -5,5 +5,9 @@
   "python.analysis.extraPaths": [
     "${workspaceFolder}/bot"
   ],
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "cursorpyright.analysis.extraPaths": [
+    "${workspaceFolder}/bot"
+  ],
+  "cursorpyright.analysis.typeCheckingMode": "basic"
 }

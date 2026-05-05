@@ -3,8 +3,13 @@ import logging
 import os
 from dotenv import load_dotenv
 
-# Load environment variables FIRST
-load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+# Load environment variables FIRST.
+# Local dev: allow `bot/.env` (optional).
+# Production (Railway): env vars are injected by the platform.
+_bot_env_path = os.path.join(os.path.dirname(__file__), ".env")
+if os.path.exists(_bot_env_path):
+    load_dotenv(_bot_env_path)
+load_dotenv()
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommand, BotCommandScopeChat
@@ -19,6 +24,12 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 async def main():
     logging.basicConfig(level=logging.INFO)
+
+    if not BOT_TOKEN:
+        raise RuntimeError(
+            "Missing required env var BOT_TOKEN. "
+            "On Railway: Service → Variables → add BOT_TOKEN (your Telegram bot token)."
+        )
     
     # Initialize Database
     init_db()

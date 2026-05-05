@@ -129,7 +129,11 @@ async def start_menu(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "template_menu")
 async def template_menu(callback: CallbackQuery):
     await callback.answer()
-    text = "📄 *Choose a Template*\n\nPick a style to start."
+    text = (
+        "📄 *Choose a Template*\n\n"
+        "Pick a style to start your website.\n"
+        "_Tip: tap More ▶ for more templates._"
+    )
     photo = FSInputFile(TEMPLATE_IMAGE)
     try:
         await callback.message.edit_media(
@@ -223,7 +227,11 @@ async def cmd_help(message: Message):
 async def cmd_create(message: Message, state: FSMContext):
     """Start the builder via command — goes straight to template selection."""
     await state.clear()
-    text = "📄 *Choose a Template*\n\nPick a style to start."
+    text = (
+        "📄 *Choose a Template*\n\n"
+        "Pick a style to start your website.\n"
+        "_Tip: tap More ▶ for more templates._"
+    )
     photo = FSInputFile(TEMPLATE_IMAGE)
     try:
         await message.answer_photo(

@@ -291,7 +291,7 @@ STYLE_PRESETS = {
         "bg_spot_3": "rgba(236, 72, 153, 0.08)",
     },
     "light_meadow": {
-        "name": "   Light Meadow",
+        "name": "🌿 Light Meadow",
         "bg_color": "#fcfdfc",
         "text_color": "#111827",
         "accent_color": "#22c55e",

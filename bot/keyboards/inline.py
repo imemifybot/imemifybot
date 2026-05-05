@@ -3,27 +3,49 @@ from utils.states import SECTIONS, SECTION_META
 from utils.styles import STYLE_PRESETS
 
 
+# ─────────────────────────────────────────────
+# Small UI helpers
+# ─────────────────────────────────────────────
+
+TUTORIAL_URL = "https://www.youtube.com/watch?v=VKTDJS7DT08"
+
+def _preset_label(preset: dict) -> str:
+    """Human-friendly preset label for Telegram buttons."""
+    name = (preset.get("name") or "").strip()
+    return name or "Template"
+
+
 # ═══════════════════════════════════════════
 # START / MAIN MENU
 # ═══════════════════════════════════════════
 
 def get_start_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🚀 Create Website", callback_data="template_menu")],
-        [InlineKeyboardButton(text="❓ How It Works", callback_data="help_menu"),
-         InlineKeyboardButton(text="📺 Watch Tutorial", url="https://youtube.com/your_video_link_here")],
-        [InlineKeyboardButton(text="🌐 Visit Website", url="https://imemifybot.online/"),
-         InlineKeyboardButton(text="👥 Join Community", url="https://t.me/iMemify_bot")],
+        [
+            InlineKeyboardButton(text="🚀 Create Website", callback_data="template_menu"),
+            InlineKeyboardButton(text="❓ How It Works", callback_data="help_menu"),
+        ],
+        [
+            InlineKeyboardButton(text="📺 Tutorial", url=TUTORIAL_URL),
+            InlineKeyboardButton(text="🌐 Website", url="https://imemifybot.online/"),
+        ],
+        [
+            InlineKeyboardButton(text="👥 Community", url="https://t.me/iMemify_bot"),
+            InlineKeyboardButton(text="💬 Support", url="https://t.me/ApeNo1"),
+        ],
     ])
 
 
 def get_help_keyboard():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📺 Watch Tutorial", url="https://youtube.com/your_video_link_here"),
-         InlineKeyboardButton(text="💬 Contact Support", url="https://t.me/ApeNo1")],
-        [InlineKeyboardButton(text="🌐 Visit Website", url="https://imemifybot.online/"),
-         InlineKeyboardButton(text="👥 Join Community", url="https://t.me/iMemify_bot")],
-        [InlineKeyboardButton(text="📞 Contact Admin", url="https://t.me/ApeNo1")],
+        [
+            InlineKeyboardButton(text="📺 Tutorial", url=TUTORIAL_URL),
+            InlineKeyboardButton(text="💬 Support", url="https://t.me/ApeNo1"),
+        ],
+        [
+            InlineKeyboardButton(text="🌐 Website", url="https://imemifybot.online/"),
+            InlineKeyboardButton(text="👥 Community", url="https://t.me/iMemify_bot"),
+        ],
         [InlineKeyboardButton(text="⬅️ Back", callback_data="start_menu")],
     ])
 
@@ -32,8 +54,9 @@ def get_help_keyboard():
 
 
 def get_template_keyboard(page: int = 1):
-    presets = list(STYLE_PRESETS.items())
-    mid = len(presets) // 2  # split into two pages
+    # Sort presets by readable name for a nicer list.
+    presets = sorted(STYLE_PRESETS.items(), key=lambda kv: _preset_label(kv[1]).lower())
+    mid = (len(presets) + 1) // 2  # split into two pages
     if page == 1:
         page_presets = presets[:mid]
     else:
@@ -46,7 +69,7 @@ def get_template_keyboard(page: int = 1):
             if i + j < len(page_presets):
                 key, preset = page_presets[i + j]
                 row.append(InlineKeyboardButton(
-                    text=preset["name"],
+                    text=_preset_label(preset),
                     callback_data=f"tpl_{key}"
                 ))
         rows.append(row)
@@ -55,7 +78,7 @@ def get_template_keyboard(page: int = 1):
     if page == 1:
         rows.append([
             InlineKeyboardButton(text="⬅️ Back", callback_data="start_menu"),
-            InlineKeyboardButton(text="Next ▶", callback_data="tpl_page_2"),
+            InlineKeyboardButton(text="More ▶", callback_data="tpl_page_2"),
         ])
     else:
         rows.append([
@@ -67,8 +90,8 @@ def get_template_keyboard(page: int = 1):
 
 def get_global_style_keyboard(page: int = 1):
     """Paginated global style preset picker — mirrors the template keyboard."""
-    presets = list(STYLE_PRESETS.items())
-    mid = len(presets) // 2
+    presets = sorted(STYLE_PRESETS.items(), key=lambda kv: _preset_label(kv[1]).lower())
+    mid = (len(presets) + 1) // 2
     if page == 1:
         page_presets = presets[:mid]
     else:
@@ -81,7 +104,7 @@ def get_global_style_keyboard(page: int = 1):
             if i + j < len(page_presets):
                 key, preset = page_presets[i + j]
                 row.append(InlineKeyboardButton(
-                    text=preset["name"],
+                    text=_preset_label(preset),
                     callback_data=f"globalstyle_{key}"
                 ))
         rows.append(row)
