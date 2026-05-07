@@ -5,36 +5,57 @@ from utils.states import BuilderState
 from keyboards.inline import get_payment_keyboard, get_start_keyboard
 from keyboards.admin import get_admin_approval_keyboard
 from database.db import add_transaction, tx_exists, log_activity
-from services.bscscan import REQUIRED_AMOUNT_USDT, WALLET_ADDRESS
 import os
 import logging
+from typing import Any
 
 router = Router()
 logger = logging.getLogger(__name__)
 
 ADMIN_ID = os.getenv("ADMIN_ID")
-SOL_WALLET_ADDRESS = os.getenv("SOL_WALLET_ADDRESS")
-TRC_WALLET_ADDRESS = os.getenv("TRC_WALLET_ADDRESS")
+WALLET_ADDRESS = os.getenv("WALLET_ADDRESS")
+
+try:
+    REQUIRED_AMOUNT_USDT = float(os.getenv("PRICE_USDT", "10"))
+except ValueError:
+    REQUIRED_AMOUNT_USDT = 10.0
+
+
+def _display_wallet(value: str | None) -> str:
+    """Never show raw None/empty to users in payment instructions."""
+    if not value:
+        return "Not configured yet"
+    cleaned = value.strip()
+    return cleaned if cleaned else "Not configured yet"
 
 
 
 @router.callback_query(F.data.startswith("pay_"))
 async def process_payment(callback: CallbackQuery, state: FSMContext):
+    if callback.message is None:
+        await callback.answer("Message not found.")
+        return
+
+    if not callback.data:
+        await callback.answer("Invalid payment request.")
+        return
+
     project_id = int(callback.data.split("_")[1])
 
-    log_activity(callback.from_user.id, "payment_started", f"project_{project_id}")
+    if callback.from_user:
+        log_activity(callback.from_user.id, "payment_started", f"project_{project_id}")
+    trc_wallet_address = _display_wallet(os.getenv("TRC_WALLET_ADDRESS"))
+    bsc_wallet_address = _display_wallet(WALLET_ADDRESS)
+    sol_wallet_address = _display_wallet(os.getenv("SOL_WALLET_ADDRESS"))
 
     text = (
         f"💳 **Payment Instructions**\n\n"
         f"Price: `{REQUIRED_AMOUNT_USDT} USDT / SOL Equivalent`\n\n"
-        f"**Tether (USDT - TRC20):**\n"
-        f"`{TRC_WALLET_ADDRESS}`\n\n"
-        f"**BNB Smart Chain (BEP20):**\n"
-        f"`{WALLET_ADDRESS}`\n\n"
-        f"**Solana (SOL):**\n"
-        f"`{SOL_WALLET_ADDRESS}`\n\n"
-        "Send the exact amount and then click **I Paid** to verify.\n"
-        "*(For Solana, send the equivalent value in SOL)*"
+        f"🟢 **TRC20:** `{trc_wallet_address}`\n"
+        f"🟡 **BEP20:** `{bsc_wallet_address}`\n"
+        f"🟣 **SOL:** `{sol_wallet_address}`\n\n"
+        "Send the exact amount, then click **I Paid**.\n"
+        "_For Solana, send the equivalent value in SOL._"
     )
     await callback.answer()
 
@@ -43,20 +64,33 @@ async def process_payment(callback: CallbackQuery, state: FSMContext):
             caption=text, parse_mode="Markdown",
             reply_markup=get_payment_keyboard(project_id)
         )
+        return
     except Exception:
-        try:
-            await callback.message.edit_text(
-                text, parse_mode="Markdown",
-                reply_markup=get_payment_keyboard(project_id)
-            )
-        except Exception:
-            await callback.message.answer(
-                text, parse_mode="Markdown",
-                reply_markup=get_payment_keyboard(project_id)
-            )
+        pass
+
+    try:
+        await callback.message.edit_text(
+            text, parse_mode="Markdown",
+            reply_markup=get_payment_keyboard(project_id)
+        )
+        return
+    except Exception:
+        pass
+
+    await callback.message.answer(
+        text, parse_mode="Markdown",
+        reply_markup=get_payment_keyboard(project_id)
+    )
 
 @router.callback_query(F.data.startswith("verify_tx_"))
 async def verify_tx_start(callback: CallbackQuery, state: FSMContext):
+    if callback.message is None:
+        await callback.answer("Message not found.")
+        return
+    if not callback.data:
+        await callback.answer("Invalid request.")
+        return
+
     project_id = int(callback.data.removeprefix("verify_tx_"))
     await state.update_data(project_id=project_id)
     await state.set_state(BuilderState.tx_hash)
@@ -68,15 +102,28 @@ async def verify_tx_start(callback: CallbackQuery, state: FSMContext):
     )
     try:
         await callback.message.edit_caption(caption=text, parse_mode="Markdown")
+        return
     except Exception:
-        try:
-            await callback.message.edit_text(text, parse_mode="Markdown")
-        except Exception:
-            await callback.message.answer(text, parse_mode="Markdown")
+        pass
+
+    try:
+        await callback.message.edit_text(text, parse_mode="Markdown")
+        return
+    except Exception:
+        pass
+
+    await callback.message.answer(text, parse_mode="Markdown")
 
 
 @router.message(BuilderState.tx_hash)
 async def verify_tx_hash(message: Message, state: FSMContext):
+    if message.text is None:
+        await message.answer("Please send text Transaction Hash.")
+        return
+    if message.from_user is None:
+        await message.answer("User not found. Please try again.")
+        return
+
     tx_hash = message.text.strip()
     data = await state.get_data()
     project_id = data.get("project_id")

@@ -130,8 +130,8 @@ async def show_hub(target, state: FSMContext):
 
     text = (
         "🛠️ **Website Builder**\n\n"
-        "Select a section to edit:\n"
-        "_⬜ = Enabled (no content yet)  ✅ = Filled  🔴 = Disabled_"
+        "Choose a section to edit, or tap **🎨 Style All Sections** to apply one style to all sections.\n\n"
+        "_⬜ = Enabled (no content yet) | ✅ = Filled | 🔴 = Disabled_"
     )
     await safe_reply(target, text, reply_markup=get_builder_hub_keyboard(site_data))
 

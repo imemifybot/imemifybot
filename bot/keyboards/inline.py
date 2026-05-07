@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from utils.states import SECTIONS, SECTION_META
 from utils.styles import STYLE_PRESETS
+import os
 
 
 # ─────────────────────────────────────────────
@@ -8,6 +9,7 @@ from utils.styles import STYLE_PRESETS
 # ─────────────────────────────────────────────
 
 TUTORIAL_URL = "https://www.youtube.com/watch?v=VKTDJS7DT08"
+PRICE_USDT_LABEL = os.getenv("PRICE_USDT", "15")
 
 def _preset_label(preset: dict) -> str:
     """Human-friendly preset label for Telegram buttons."""
@@ -260,7 +262,7 @@ def get_after_input_keyboard(section: str):
 
 def get_preview_keyboard(project_id: int):
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Pay & Deploy (15 USDT)", callback_data=f"pay_{project_id}")],
+        [InlineKeyboardButton(text=f"💳 Pay & Deploy ({PRICE_USDT_LABEL} USDT)", callback_data=f"pay_{project_id}")],
         [InlineKeyboardButton(text="✏️ Edit Sections", callback_data="back_to_hub")],
         [InlineKeyboardButton(text="⬅️ Back to Main Menu", callback_data="start_menu")],
     ])
