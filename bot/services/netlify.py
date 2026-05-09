@@ -8,16 +8,45 @@ from dotenv import load_dotenv
 # Load env variables strictly from bot/.env
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 
-# Only use the first token
-NETLIFY_ACCESS_TOKEN = os.getenv("NETLIFY_ACCESS_TOKEN_1") or os.getenv("NETLIFY_ACCESS_TOKEN")
+NETLIFY_ACCESS_TOKEN_1 = (os.getenv("NETLIFY_ACCESS_TOKEN_1") or "").strip()
+NETLIFY_ACCESS_TOKEN_2 = (os.getenv("NETLIFY_ACCESS_TOKEN_2") or "").strip()
+NETLIFY_ACCESS_TOKEN_FALLBACK = (os.getenv("NETLIFY_ACCESS_TOKEN") or "").strip()
+
+def _token_candidates() -> list[str]:
+    """
+    Return token candidates in priority order.
+    - Prefer explicit token 1, then token 2, then legacy NETLIFY_ACCESS_TOKEN.
+    """
+    tokens: list[str] = []
+    for t in (NETLIFY_ACCESS_TOKEN_1, NETLIFY_ACCESS_TOKEN_2, NETLIFY_ACCESS_TOKEN_FALLBACK):
+        if t and t not in tokens:
+            tokens.append(t)
+    return tokens
+
+async def _deploy_with_token(session: aiohttp.ClientSession, token: str, zip_bytes: bytes) -> tuple[int, str, dict]:
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/zip",
+    }
+    url = "https://api.netlify.com/api/v1/sites"
+    async with session.post(url, headers=headers, data=zip_bytes) as response:
+        status = response.status
+        text = await response.text()
+        data = {}
+        try:
+            data = await response.json()
+        except Exception:
+            data = {}
+        return status, text, data
 
 async def deploy_to_netlify(html_content: str, project_name: str) -> str:
     """
     Deploys a single HTML string as index.html to Netlify via a zip upload.
     Returns the site URL if successful, otherwise raises an exception.
     """
-    if not NETLIFY_ACCESS_TOKEN:
-        raise ValueError("NETLIFY_ACCESS_TOKEN_1 is not set in .env")
+    tokens = _token_candidates()
+    if not tokens:
+        raise ValueError("No Netlify access token configured. Set NETLIFY_ACCESS_TOKEN_1 (and optionally _2) in bot/.env.")
 
     # Create a zip file in memory containing the index.html inside a directory.
     # Netlify requires the file to be inside a directory in the zip to render HTML properly.
@@ -29,29 +58,26 @@ async def deploy_to_netlify(html_content: str, project_name: str) -> str:
         zip_file.writestr(info, html_content)
 
     zip_buffer.seek(0)
-    
-    headers = {
-        "Authorization": f"Bearer {NETLIFY_ACCESS_TOKEN}",
-        "Content-Type": "application/zip",
-    }
-    
-    url = "https://api.netlify.com/api/v1/sites"
-    
+
+    zip_bytes = zip_buffer.read()
+
     async with aiohttp.ClientSession() as session:
-        # Step 1: Create a site or deploy directly
-        async with session.post(url, headers=headers, data=zip_buffer.read()) as response:
-            if response.status not in (200, 201):
-                error_text = await response.text()
-                raise Exception(f"Netlify API Error {response.status}: {error_text}")
-            
-            data = await response.json()
-            site_url = data.get("ssl_url") or data.get("url")
-            
-            # Ensure it is https
-            if site_url and site_url.startswith("http://"):
-                site_url = site_url.replace("http://", "https://", 1)
-            
-            if not site_url:
-                raise Exception("Netlify API did not return a site URL.")
-                
-            return site_url
+        last_error = None
+        for idx, token in enumerate(tokens):
+            status, error_text, data = await _deploy_with_token(session, token, zip_bytes)
+            if status in (200, 201):
+                site_url = (data.get("ssl_url") or data.get("url") or "").strip()
+                if site_url.startswith("http://"):
+                    site_url = site_url.replace("http://", "https://", 1)
+                if not site_url:
+                    raise Exception("Netlify API did not return a site URL.")
+                return site_url
+
+            # Retry with next token on common auth/rate/limit errors.
+            last_error = f"Netlify API Error {status}: {error_text}"
+            if status not in (401, 403, 429):
+                break
+            if idx < len(tokens) - 1:
+                continue
+
+        raise Exception(last_error or "Netlify deploy failed.")

@@ -554,6 +554,7 @@ async def admin_approve_payment(callback: CallbackQuery):
 
             success_keyboard = InlineKeyboardMarkup(inline_keyboard=[
                 [InlineKeyboardButton(text="🌐 View Live Website", url=site_url)],
+                [InlineKeyboardButton(text="🏠 Back to Main Menu", callback_data="start_menu")],
                 [InlineKeyboardButton(text="🔗 Host on Custom Domain (Tutorial)",
                                       url="https://www.youtube.com/watch?v=eY8dmF0a95g")]
             ])

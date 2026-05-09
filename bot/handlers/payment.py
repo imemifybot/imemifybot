@@ -28,6 +28,9 @@ def _display_wallet(value: str | None) -> str:
     cleaned = value.strip()
     return cleaned if cleaned else "Not configured yet"
 
+def _is_wallet_configured(value: str | None) -> bool:
+    return bool(value and value.strip())
+
 
 
 @router.callback_query(F.data.startswith("pay_"))
@@ -44,9 +47,26 @@ async def process_payment(callback: CallbackQuery, state: FSMContext):
 
     if callback.from_user:
         log_activity(callback.from_user.id, "payment_started", f"project_{project_id}")
-    trc_wallet_address = _display_wallet(os.getenv("TRC_WALLET_ADDRESS"))
-    bsc_wallet_address = _display_wallet(WALLET_ADDRESS)
-    sol_wallet_address = _display_wallet(os.getenv("SOL_WALLET_ADDRESS"))
+
+    raw_trc = os.getenv("TRC_WALLET_ADDRESS")
+    raw_bsc = WALLET_ADDRESS
+    raw_sol = os.getenv("SOL_WALLET_ADDRESS")
+
+    # If wallets are missing, do NOT show the payment window (prevents empty address payment screen).
+    if not (_is_wallet_configured(raw_trc) or _is_wallet_configured(raw_bsc) or _is_wallet_configured(raw_sol)):
+        await callback.answer("Payment is not configured yet.", show_alert=True)
+        await callback.message.answer(
+            "⚠️ **Payment is temporarily unavailable**\n\n"
+            "The wallet address is not configured. Please contact support/admin.\n\n"
+            "Returning to the main menu.",
+            parse_mode="Markdown",
+            reply_markup=get_start_keyboard(),
+        )
+        return
+
+    trc_wallet_address = _display_wallet(raw_trc)
+    bsc_wallet_address = _display_wallet(raw_bsc)
+    sol_wallet_address = _display_wallet(raw_sol)
 
     text = (
         f"💳 **Payment Instructions**\n\n"
